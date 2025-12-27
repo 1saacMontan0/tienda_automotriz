@@ -1,0 +1,308 @@
+:root {
+    --primary-color: #1a5fb4;
+    --primary-dark: #0d4a8a;
+    --secondary-color: #26a269;
+    --secondary-dark: #1a7c4a;
+    --danger-color: #c01c28;
+    --text-dark: #000000;
+    --text-light: #ffffff;
+    --border-color: #c0bfbc;
+    --font-title: 'Segoe UI', system-ui, sans-serif;
+    --font-body: Arial, sans-serif;
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: #f8f9fa;
+}
+
+/* Tabs */
+.tabs-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.tabs-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.tabs-title {
+    text-align: center;
+    color: white;
+    padding: 1rem;
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.tabs-nav {
+    display: flex;
+    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-button {
+    padding: 1rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tab-button a {
+    padding: 1rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none
+}
+
+.tab-button.active {
+    color: white;
+    border-bottom: 3px solid white;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.logout-btn {
+    margin-left: auto;
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+}
+
+/* Tab content */
+.tabs-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.tab-content {
+    padding: 1rem;
+}
+
+/* Card */
+.card {
+    background: #f6f5f4;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+    border: 1px solid rgba(192, 191, 188, 0.3);
+    overflow: hidden
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: #252525;
+    padding: 1rem;
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+/* Form */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    transition: all 0.3s ease;
+    color: var(--text-dark);
+}
+
+input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 95, 180, 0.2);
+    outline: none;
+}
+
+.validation-message {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    color: var(--danger-color);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-light);
+    font-family: var(--font-title);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--secondary-dark), var(--secondary-color));
+}
+
+.export-buttons {
+    display: flex;
+    gap: 0.5rem;
+    width:100%;
+    margin: 10px 0;
+    justify-content: flex-end;
+}
+
+.export-btn {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.export-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Table */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(192, 191, 188, 0.3);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: var(--text-light);
+}
+
+th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-family: var(--font-title);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(192, 191, 188, 0.3);
+    vertical-align: middle;
+    color: var(--text-dark);
+}
+
+tbody tr:hover {
+    background-color: rgba(26, 95, 180, 0.05);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.brand-model-section {
+  background: rgba(26, 95, 180, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--primary-color);
+  backdrop-filter: blur(10px);
+}
+
+.brand-model-section h4 {
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+  font-family: var(--font-title);
+}
+
+.brand-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.brand-tag {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(192, 191, 188, 0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: var(--font-title);
+}
+
+.form-select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+    appearance: none; /* quita la flecha nativa */
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%231a5fb4' height='24' viewBox='0 0 24 24' width='24'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(26, 95, 180, 0.15);
+    outline: none;
+}
+
+.form-select option {
+    color: var(--text-dark);
+    background: #fff;
+}
