@@ -10,12 +10,9 @@
 
 # Nota: el nombre de la variable donde guardas el retorno no importa.
 
-require ('../vendor/autoload.php');
-
 function conexion($host, $user, $secret, $db) {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $secret);
     $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
     return $pdo;
 }
-
 ?>

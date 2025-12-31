@@ -8,18 +8,21 @@ require ('../../utils/mensajes_back.php'); # mensajes de error
 require ("../../controllers/filtros/check_session.php"); # comprobar session.
 $redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
 
-session_start();
 
-# conexion a la base de datos
-$conexion = conexion($_ENV['HOST'], $_ENV['USER'], $_ENV['SECRET'], $_ENV['DB']);
-# verificar session
-if (isset($_SESSION['usuario'], $_SESSION['id_empresa'], $_SESSION['rol'])) {
-    check_session($conexion,
-        $_SESSION['usuario'], $_SESSION['id_empresa'], $_SESSION['rol'], $redirec
-    );
+$redirec = "../../pages/gestion/compras.php"; # donde se enviara al usuario si algo falla.
+if (empty($_SESSION['id_inventario'])) {
+    $_SESSION['errores'][] = 'No se han seleccionado registros';
+    header ("Location: $redirec");
+    exit;
 }
-else {
-    $_SESSION['errores'][] = 'usuario no autorizado';
+
+# obtiene un registro segun el id
+$registro = inventario_individual($conexion, $_SESSION['id_inventario']);
+# verificar si existen valores de retorno
+if (isset($registro)) {
+    // Accedemos a la primera fila [0]
+    $inventario = $registro[0];
+} else {
     header("Location: $redirec");
     exit;
 }
@@ -68,7 +71,7 @@ else {
             <div class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h2>📦 Registro de Compras</h2>
+                        <h2>📦 Actualizar inventario</h2>
                     </div>
                     <div class="card-body">
 
@@ -83,24 +86,19 @@ else {
                             </div>
                         </div>
 
-                    <form method=POST action="../../controllers/compras/registrar.php">
+                    <form method=POST action="../../controllers/compras/actualizar_inventario.php">
                         <div class="form-grid">
-                            <div>
-                                <label for="tipo">Tipo de Compra *</label>
-                                <select id="tipo" class="form-select" name=tipo>
-                                    <option value="inventario">Para Inventario</option>
-                                    <option value="servicio">Servicio/Otro Producto</option>
-                                </select>
-                            </div>
+                            <input type=hidden name=id_inventario value=<?php echo $_SESSION['id_inventario']?>>
                             <div>
                                 <label for="descripcion">Descripción *</label>
                                 <input id="descripcion" name=descripcion class="form-control"
-                                    placeholder="Ej: Compra de repuestos">
+                                    value='<?php echo $inventario['descripcion']; ?>' placeholder="Ej: Compra de repuestos">
                             </div>
                             <div id="compProductoContainer">
                                 <label for="producto">Producto *</label>
                                 <input id="producto" class="input-with-datalist" list="productosList"
-                                    name=producto placeholder="Ej: Bumper delantero" required>
+                                    value=<?php echo $inventario['nombre']?> name=producto
+                                    placeholder="Ej: Bumper delantero" required>
                                 <datalist id="productosList">
                                     <option value="Bumper delantero">
                                     <option value="Bumper trasero">
@@ -117,7 +115,8 @@ else {
                             <div id="compMarcaContainer">
                                 <label for="marca">Marca *</label>
                                 <input id="marca" class="input-with-datalist" list="marcasList"
-                                    name=marca placeholder="Ej: Kia" required>
+                                    value=<?php echo $inventario['marca']?> name=marca
+                                    placeholder="Ej: Kia" required>
                                 <datalist id="marcasList">
                                     <option value="Kia">
                                     <option value="Hyundai">
@@ -128,7 +127,8 @@ else {
                             <div id="compModeloContainer">
                                 <label for="modelo">Modelo *</label>
                                 <input id="modelo" class="input-with-datalist" list="modelosList"
-                                    name=modelo placeholder="Ej: Sportage" required>
+                                    value=<?php echo $inventario['modelo']?> name=modelo
+                                    placeholder="Ej: Sportage" required>
                                 <datalist id="modelosList">
                                     <option value="Sportage">
                                     <option value="Sorento">
@@ -146,28 +146,32 @@ else {
                                 <div>
                                     <label for="compatible_desde">Año desde *</label>
                                     <input id="compatible_desde" class="form-control" name=compatible_desde
-                                        type="number" min="1900" max="2050" placeholder="Ej: 2017" required>
+                                        value=<?php echo $inventario['compatible_desde']?> type="number"
+                                        min="1900" max="2050" placeholder="Ej: 2017" required>
                                 </div>
                                 <div>
                                     <label for="compatible_hasta">Año hasta *</label>
                                     <input id="compatible_hasta" class="form-control" name=compatible_hasta
-                                        type="number" min="1900" max="2050" placeholder="Ej: 2022" required>
+                                        value=<?php echo $inventario['compatible_hasta']?> type="number"
+                                        min="1900" max="2050" placeholder="Ej: 2022" required>
                                 </div>
                             </div>
                             <div>
                                 <label for="cantidad">Cantidad *</label>
                                 <input id="cantidad" class="form-control" type="number" name=cantidad
-                                    min="1" placeholder="Ej: 5" required>
+                                    value=<?php echo $inventario['unidades']?> min="1" placeholder="Ej: 5" required>
                             </div>
                             <div>
                                 <label for="precio_compra">Precio Compra *</label>
                                 <input id="precio_compra" class="form-control" type="number" name=precio_compra
-                                    min="0" step="0.01" placeholder="Ej: 125.50" required>
+                                    value=<?php echo $inventario['precio_compra']?> min="0" step="0.01"
+                                    placeholder="Ej: 125.50" required>
                             </div>
                             <div id="compPrecioVentaContainer">
                                 <label for="precio_venta">Precio Venta *</label>
                                 <input id="precio_venta" class="form-control" type="number" name=precio_venta
-                                    min="0" step="0.01" placeholder="Ej: 200.00" required>
+                                    value=<?php echo $inventario['precio_venta']?> min="0" step="0.01"
+                                    placeholder="Ej: 200.00" required>
                             </div>
                             <div style="display: flex; align-items: end;">
                                 <button id=enviar class="btn btn-success">
@@ -177,79 +181,12 @@ else {
                         </div>
                     </form>
                     <?php error_mensaje_back(); ?>
-                        <div class="d-flex justify-content-between mb-3">
-                            <form method=POST action="../../controllers/compras/reportes.php">
-                                <div class="export-buttons">
-                                    <button class="export-btn" name=reporte value=excel>📊 Excel</button>
-                                    <button class="export-btn" name=reporte value=pdf>📄 PDF</button>
-                                    <button class="export-btn" name=reporte value=json>📁 JSON</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Descripción</th>
-                                        <th>Producto</th>
-                                        <th>Marca</th>
-                                        <th>Modelo</th>
-                                        <th>Año</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio Compra</th>
-                                        <th>Precio Venta</th>
-                                        <th>Fecha y Hora</th>
-                                        <th>Acciones</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaCompras">
-                                    <?php generar_compras($conexion, $_SESSION['id_empresa']); ?>
-                                </tbody>
-                            </table>
-                        </div>
-
                     </div>
                 </div>
             </div>
         </div>
 
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectTipo = document.getElementById('tipo');
-            
-            const contenedoresOcultables = [
-                document.getElementById('compProductoContainer'),
-                document.getElementById('compMarcaContainer'),
-                document.getElementById('compModeloContainer'),
-                document.getElementById('compAnoContainer'),
-                document.getElementById('compPrecioVentaContainer')
-            ];
-
-            function actualizarVisibilidad() {
-                const esInventario = selectTipo.value === 'inventario';
-                
-                contenedoresOcultables.forEach(container => {
-                    if (esInventario) {
-                        container.style.display = 'block';
-                        // Activa el required solo si es inventario
-                        container.querySelectorAll('input').forEach(input => input.required = true);
-                    } else {
-                        container.style.display = 'none';
-                        // Desactiva el required para que deje enviar el formulario como servicio
-                        container.querySelectorAll('input').forEach(input => input.required = false);
-                    }
-                });
-            }
-
-            selectTipo.addEventListener('change', actualizarVisibilidad);
-            actualizarVisibilidad(); // Ejecución inicial
-        });
-    </script>
     <script type=module>
         import { validaciones_front } from "/automotriz/controllers/filtros/validaciones_front.js";
 
@@ -265,3 +202,7 @@ else {
     </script>
 </body>
 </html>
+
+<?php
+    unset($_SESSION['id_inventario']);
+?>

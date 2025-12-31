@@ -5,8 +5,7 @@
 require ("../../vendor/autoload.php");   # librerias composer y variables de entorno.
 require ("../../.config/.conexion.php"); # conexion a la base de datos.
 require ("../../controllers/filtros/check_session.php"); # comprobar session.
-require ("../../models/lecturas/clientes.php"); # funcion de registro de clientes
-require ('../../utils/mensajes_back.php');
+require ("../../models/lecturas/clientes.php"); # genera la tabla de clientes
 $redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
 
 session_start();
@@ -25,6 +24,25 @@ else {
     exit;
 }
 
+# obtiene un registro segun el id
+$registro = cliente_individual($conexion, $_POST['id']);
+# verificar si existen valores de retorno
+if (isset($registro)) {
+    // Accedemos a la primera fila [0]
+    $cliente = $registro[0];
+} else {
+    header("Location: ../../pages/gestion/clientes.php");
+    exit;
+}
+
+# verifica si has seleccionado el id de algun usuario.
+$redirec = "../../pages/gestion/clientes.php"; # donde se enviara al usuario si algo falla.
+if (empty($_POST['id'])) {
+    $_SESSION['errores'][] = 'Debes seleccionar un cliente';
+    header("Location: $redirec");
+    exit;
+}
+
 
 ?>
 
@@ -34,28 +52,6 @@ else {
         <title>Gestion de clientes</title>
         <meta charset=utf-8>
         <link rel=stylesheet href=../../styles/clientes.css>
-        <style>
-            .edit-btn:hover {
-                background: var(--primary-color);
-                color: white;
-                transform: translateY(-1px);
-            }
-            .delete-btn:hover {
-                background: var(--danger-color);
-                color: white;
-                transform: translateY(-1px);
-            }
-            .wha-btn:hover {
-                background: #25d366;
-                color: white;
-                transform: translateY(-1px);
-            }
-            .correo-btn:hover {
-                background: #4285f4;
-                color: white;
-                transform: translateY(-1px);
-            }
-        </style>
     </head>
     <body>
 
@@ -95,87 +91,73 @@ else {
                     <div class="tab-content">
                         <div class="card">
                             <div class="card-header">
-                                <h2>👥 Gestión de Clientes</h2>
+                                <h2>👥 Actualizar información de Clientes</h2>
                             </div>
                             <div class="card-body">
                                 <!-- Formulario de clientes -->
-                                <form method=POST action="../../controllers/clientes/registrar.php">
+                                <form method=POST action=../../controllers/clientes/actualizar.php>
                                     <div class="form-grid">
+                                        <input name=id type=hidden value="<?php echo $_POST['id'] ?>">
                                         <div>
                                             <label for="nombre">Nombre completo *</label>
-                                            <input id="nombre" class="form-control" placeholder="Ej: Juan Pérez" name=nombre required>
+                                            <input id="nombre" class="form-control"
+                                                name=nombre value="<?php echo $cliente['nombre']; ?>"
+                                                placeholder="Ej: Juan Pérez" required>
                                             <div class="validation-message" id="cNombreError"></div>
                                         </div>
                                         <div>
                                             <label for="telefono">Teléfono *</label>
-                                            <input id="telefono" class="form-control" placeholder="Ej: 7123-4567" name=telefono required>
+                                            <input id="telefono" class="form-control"
+                                                name=telefono value="<?php echo $cliente['telefono']; ?>"
+                                                placeholder="Ej: 7123-4567" required>
                                             <div class="validation-message" id="cTelefonoError"></div>
                                         </div>
                                         <div>
                                             <label for="correo">Correo electrónico *</label>
-                                            <input id="correo" class="form-control" type="email" placeholder="Ej: cliente@correo.com" name=correo required>
+                                            <input id="correo" class="form-control" type="email"
+                                                name=correo value="<?php echo $cliente['correo']; ?>"
+                                                placeholder="Ej: cliente@correo.com" required>
                                             <div class="validation-message" id="cCorreoError"></div>
                                         </div>
                                         <div>
                                             <label for="direccion">Dirección</label>
-                                            <input id="direccion" class="form-control" placeholder="Ej: San Salvador" name=direccion>
+                                            <input id="direccion" class="form-control"
+                                                name=direccion value="<?php echo $cliente['direccion']; ?>"
+                                                placeholder="Ej: San Salvador">
                                         </div>
                                         <div>
                                             <label for="registro_iva">Registro IVA</label>
-                                            <input id="reegistro_iva" class="form-control" placeholder="Opcional" name=registro_iva>
+                                            <input id="registro_iva" class="form-control"
+                                                name=registro_iva
+                                                placeholder="Opcional">
                                         </div>
                                         <div>
                                             <label for="nit">Registro NIT</label>
-                                            <input id="nit" class="form-control" placeholder="Opcional" name=nit>
+                                            <input id="nit" class="form-control"
+                                                name=nit value="<?php echo $cliente['nit']; ?>"
+                                                placeholder="Opcional">
                                         </div>
                                     </div>
-                                    <button class="btn btn-success" id=enviar>                             
-                                        <span>💾</span> Guardar Cliente
-                                    </button>
-                                </form>
-                                <?php error_mensaje_back(); ?>
-                                <form method=POST action='../../controllers/clientes/reportes.php'>
-                                    <div class="export-buttons">
-                                        <button class="export-btn" name=reporte value=excel>📊 Excel</button>
-                                        <button class="export-btn" name=reporte value=pdf>📄 PDF</button>
-                                        <button class="export-btn" name=reporte value=json>📁 JSON</button>
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <button class="btn btn-success" onclick="guardarCliente()">
+                                            <span>💾</span> Actualizar registro
+                                        </button>
                                     </div>
                                 </form>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Nombre</th>
-                                                <th>Teléfono</th>
-                                                <th>Correo</th>
-                                                <th>Dirección</th>
-                                                <th>Total Comprado</th>
-                                                <th>Fecha Registro</th>
-                                                <th>Acciones</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                                generar_clientes($conexion, $_SESSION['id_empresa']);
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>     
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </body>
-    <script type=module>
-        import { validaciones_front } from "/automotriz/controllers/filtros/validaciones_front.js";
+        <script type=module>
+            import { validaciones_front } from "/automotriz/controllers/filtros/validaciones_front.js";
 
-        validaciones_front("nombre","nombre", "no_especial","No se aceptan caracteres especiales");
-        validaciones_front("telefono","telefono", "telefono","Unicamente se aceptan numeros de has 8 digitos");
-        validaciones_front("correo","correo", "correo","El formato de correo es incorrecto");
-        validaciones_front("direccion","direccion", "no_especial","No se aceptan caracteres especiales");
-        validaciones_front("nit","nit", "nit","Solo se aceptan numeros de hasta 14 digitos");
-    </script>
+            validaciones_front("nombre","nombre", "no_especial","No se aceptan caracteres especiales");
+            validaciones_front("telefono","telefono", "telefono","Unicamente se aceptan numeros de has 8 digitos");
+            validaciones_front("correo","correo", "correo","El formato de correo es incorrecto");
+            validaciones_front("direccion","direccion", "no_especial","No se aceptan caracteres especiales");
+            validaciones_front("nit","nit", "nit","Solo se aceptan numeros de hasta 14 digitos");
+        </script>
+    </body>
 </html>
