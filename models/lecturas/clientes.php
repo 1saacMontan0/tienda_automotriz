@@ -90,4 +90,12 @@ function cliente_individual($conexion, $id_cliente) {
     return $usuario = $consulta->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function nombre_clientes($conexion, $id_empresa) {
+    $sentencia = "SELECT nombre, nit 
+        FROM clientes WHERE id_empresa=?";
+    $consulta = $conexion->prepare($sentencia);
+    $consulta->execute([$id_empresa]);
+    return $usuario = $consulta->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>

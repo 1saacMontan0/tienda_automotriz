@@ -83,7 +83,7 @@ if (!isset($registro_producto)) {
                                 <span class="brand-tag">2017+</span>
                             </div>
                         </div>
-                    <form method=POST action=../../controllers/ventas/registrar.php>
+                    <form method=POST action=../../controllers/ventas/actualizar.php>
                         <div class="form-grid">
                             <div>
                                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Cliente *</label>
@@ -182,40 +182,6 @@ if (!isset($registro_producto)) {
                                 <button class="btn btn-success" onclick="registrarVenta()">💳 Registrar Venta</button>
                             </div>
                     </form>
-                        
-                        <div class="d-flex justify-content-between mb-3">
-                            <form method=POST action="../../controllers/ventas/reportes.php">
-                                <div class="export-buttons">
-                                    <button class="export-btn" name=reporte value=excel>📊 Excel</button>
-                                    <button class="export-btn" name=reporte value=pdf>📄 PDF</button>
-                                    <button class="export-btn" name=reporte value=json>📁 JSON</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="table-responsive" style="margin-top: 1.5rem;">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Cliente</th>
-                                        <th>Producto</th>
-                                        <th>Marca/Modelo</th>
-                                        <th>Año</th>
-                                        <th>Cant.</th>
-                                        <th>Total</th>
-                                        <th>Ganancia</th>
-                                        <th>Factura</th>
-                                        <th>Fecha</th>
-                                        <th>Acciones</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaVentas">
-                                    <?php ventas($conexion, $_SESSION['id_empresa']); ?>
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div>

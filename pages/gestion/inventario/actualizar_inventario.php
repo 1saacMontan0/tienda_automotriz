@@ -1,19 +1,20 @@
 <?php
 
 # check session.
-require ("../../vendor/autoload.php");   # librerias composer y variables de entorno.
-require ("../../.config/.conexion.php"); # conexion a la base de datos.
-require ("../../models/lecturas/compras.php"); # mostrar tabla
-require ('../../utils/mensajes_back.php'); # mensajes de error
-require ("../../controllers/filtros/check_session.php"); # comprobar session.
-$redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
+require ("../../../vendor/autoload.php");   # librerias composer y variables de entorno.
+require ("../../../.config/.conexion.php"); # conexion a la base de datos.
+require ("../../../models/lecturas/compras.php"); # mostrar tabla
+require ('../../../utils/mensajes_back.php'); # mensajes de error
+require ("../../../controllers/filtros/check_session.php"); # comprobar session.
+$redirec = "../../../index.php"; # donde se enviara al usuario si algo falla.
 
 session_start();
 
 $conexion = conexion($_ENV['HOST'], $_ENV['USER'], $_ENV['SECRET'], $_ENV['DB']);
 
-$redirec = "../../pages/gestion/compras.php"; # donde se enviara al usuario si algo falla.
-if (empty($_SESSION['id_inventario'])) {
+$redirec = "../../pages/gestion/inventario.php"; # donde se enviara al usuario si algo falla.
+
+if (empty($_POST['id'])) {
     $_SESSION['errores'][] = 'No se han seleccionado registros';
     header ("Location: $redirec");
     exit;
@@ -22,7 +23,7 @@ if (empty($_SESSION['id_inventario'])) {
 $conexion = conexion($_ENV['HOST'], $_ENV['USER'], $_ENV['SECRET'], $_ENV['DB']);
 
 # obtiene un registro segun el id
-$registro = inventario_individual($conexion, $_SESSION['id_inventario']);
+$registro = inventario_individual($conexion, $_POST['id']);
 # verificar si existen valores de retorno
 if (isset($registro)) {
     // Accedemos a la primera fila [0]
@@ -39,7 +40,7 @@ if (isset($registro)) {
 <head>
     <title>Gestión compras</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="../../styles/compras.css">
+    <link rel="stylesheet" href="../../../styles/compras.css">
 </head>
 <body>
 
@@ -48,25 +49,25 @@ if (isset($registro)) {
             <div class="tabs-title">🔒 CRM + Inventario Profesional - Sistema Seguro</div>
             <div class="tabs-nav">
                 <button class="tab-button">
-                        <a href=clientes.php>👥 Clientes</a>
+                        <a href=../clientes.php>👥 Clientes</a>
+                    </button>
+                    <button class="tab-button">
+                        <a href=../compras.php>📦 Compras</a>
                     </button>
                     <button class="tab-button active">
-                        <a href=compras.php>📦 Compras</a>
+                        <a href=../inventario.php>📊 Inventario</a>
                     </button>
                     <button class="tab-button">
-                        <a href=inventario.php>📊 Inventario</a>
+                        <a href=../ventas.php>💰 Ventas</a>
                     </button>
                     <button class="tab-button">
-                        <a href=ventas.php>💰 Ventas</a>
+                        <a href=../finanzas.php>💼 Finanzas</a>
                     </button>
                     <button class="tab-button">
-                        <a href=finanzas.php>💼 Finanzas</a>
+                        <a href=../indicadores.php>📈 Indicadores</a>
                     </button>
                     <button class="tab-button">
-                        <a href=indicadores.php>📈 Indicadores</a>
-                    </button>
-                    <button class="tab-button">
-                        <a href=configuracion.php>⚙️ Configuración</a>
+                        <a href=../configuracion.php>⚙️ Configuración</a>
                     </button>
                     <button class="tab-button logout-btn">🚪 Salir</button>
             </div>
@@ -91,9 +92,9 @@ if (isset($registro)) {
                             </div>
                         </div>
 
-                    <form method=POST action="../../controllers/compras/actualizar_inventario.php">
+                    <form method=POST action="../../../controllers/inventario/actualizar_inventario.php">
                         <div class="form-grid">
-                            <input type=hidden name=id_inventario value=<?php echo $_SESSION['id_inventario']?>>
+                            <input type=hidden name=id_inventario value=<?php echo $_POST['id']?>>
                             <div>
                                 <label for="descripcion">Descripción *</label>
                                 <input id="descripcion" name=descripcion class="form-control"
@@ -185,7 +186,6 @@ if (isset($registro)) {
                             </div>
                         </div>
                     </form>
-                    <?php error_mensaje_back(); ?>
                     </div>
                 </div>
             </div>
@@ -207,7 +207,3 @@ if (isset($registro)) {
     </script>
 </body>
 </html>
-
-<?php
-    unset($_SESSION['id_inventario']);
-?>

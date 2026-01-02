@@ -22,6 +22,34 @@ else {
     exit;
 }
 
+# --- CONSULTA TOTAL VENTAS ---
+$sentencia = "SELECT SUM(total) AS total_ventas FROM ventas";
+$consulta = $conexion->prepare($sentencia);
+$consulta->execute();
+$datos = $consulta->fetch(PDO::FETCH_ASSOC);
+$totalVentas = $datos['total_ventas'] ?? 0;
+$consulta->closeCursor();
+
+# --- CONSULTA TOTAL VENTAS ---
+$sentencia = "SELECT SUM(precio_compra) AS total_compras FROM compras";
+$consulta = $conexion->prepare($sentencia);
+$consulta->execute();
+$datos = $consulta->fetch(PDO::FETCH_ASSOC);
+$totalcompras = $datos['total_compras'] ?? 0;
+$consulta->closeCursor();
+
+$sentencia = " SELECT i.nombre AS nombre
+    FROM ventas v
+    JOIN inventario i ON v.id_producto = i.id_producto
+    GROUP BY i.id_producto, i.nombre
+    ORDER BY SUM(v.cantidad) DESC
+    LIMIT 1";
+$consulta = $conexion->prepare($sentencia);
+$consulta->execute();
+$datos = $consulta->fetch(PDO::FETCH_ASSOC);
+$productoMasVendido = $datos['nombre'] ?? 0;
+$consulta->closeCursor();
+
 ?>
 
 <!DOCTYPE html>
@@ -54,7 +82,6 @@ else {
 
         .tabs-content { padding: 20px; }
 
-        /* Estilos para Indicadores */
         .indicators-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -103,27 +130,13 @@ else {
         <div class="tabs-header">
             <div class="tabs-title">🔒 CRM + Inventario Profesional - Sistema Seguro</div>
             <div class="tabs-nav">
-                <button class="tab-button">
-                    <a href="clientes.php">👥 Clientes</a>
-                </button>
-                <button class="tab-button">
-                    <a href="compras.php">📦 Compras</a>
-                </button>
-                <button class="tab-button">
-                    <a href="inventario.php">📊 Inventario</a>
-                </button>
-                <button class="tab-button">
-                    <a href="ventas.php">💰 Ventas</a>
-                </button>
-                <button class="tab-button">
-                    <a href="finanzas.php">💼 Finanzas</a>
-                </button>
-                <button class="tab-button active">
-                    <a href="indicadores.php">📈 Indicadores</a>
-                </button>
-                <button class="tab-button">
-                    <a href="configuracion.php">⚙️ Configuración</a>
-                </button>
+                <button class="tab-button"><a href="clientes.php">👥 Clientes</a></button>
+                <button class="tab-button"><a href="compras.php">📦 Compras</a></button>
+                <button class="tab-button"><a href="inventario.php">📊 Inventario</a></button>
+                <button class="tab-button"><a href="ventas.php">💰 Ventas</a></button>
+                <button class="tab-button"><a href="finanzas.php">💼 Finanzas</a></button>
+                <button class="tab-button active"><a href="indicadores.php">📈 Indicadores</a></button>
+                <button class="tab-button"><a href="configuracion.php">⚙️ Configuración</a></button>
                 <button class="tab-button logout-btn">🚪 Salir</button>
             </div>
         </div>
@@ -139,22 +152,30 @@ else {
                         <div class="indicators-grid">
                             <div class="indicator-card">
                                 <h3 style="font-size: 1rem; color: #444;">💰 Total Ventas</h3>
-                                <div id="totalVentas" class="indicator-value" style="color: var(--primary-color);">$0.00</div>
+                                <div class="indicator-value" style="color: var(--primary-color);">
+                                    $<?php echo number_format($totalVentas, 2); ?>
+                                </div>
                                 <div class="indicator-label">Acumulado</div>
                             </div>
                             <div class="indicator-card">
                                 <h3 style="font-size: 1rem; color: #444;">📦 Total Compras</h3>
-                                <div id="totalCompras" class="indicator-value" style="color: var(--warning-color);">$0.00</div>
+                                <div class="indicator-value" style="color: var(--warning-color);">
+                                    $<?php echo number_format($totalcompras, 2); ?>
+                                </div>
                                 <div class="indicator-label">Acumulado</div>
                             </div>
                             <div class="indicator-card">
                                 <h3 style="font-size: 1rem; color: #444;">📈 Utilidad Neta</h3>
-                                <div id="totalUtilidad" class="indicator-value" style="color: var(--secondary-color);">$0.00</div>
+                                <div class="indicator-value" style="color: var(--secondary-color);">
+                                    $<?php echo $totalVentas - $totalcompras; ?>
+                                </div>
                                 <div class="indicator-label">Beneficio neto</div>
                             </div>
                             <div class="indicator-card">
                                 <h3 style="font-size: 1rem; color: #444;">🏆 Producto Más Vendido</h3>
-                                <div id="productoMasVendido" class="indicator-value" style="color: var(--primary-dark);">-</div>
+                                <div class="indicator-value" style="color: var(--primary-dark);">
+                                    <?php echo $productoMasVendido; ?>
+                                </div>
                                 <div class="indicator-label">Top producto</div>
                             </div>
                         </div>
@@ -173,18 +194,54 @@ else {
                                         </tr>
                                     </thead>
                                     <tbody id="tablaTopClientes">
-                                        <tr><td colspan="5" style="text-align:center;">No hay datos de clientes</td></tr>
-                                    </tbody>
+                                        <?php
+                                        try {
+                                            // Consulta preparada con PDO
+                                            $sql = "SELECT c.nombre,
+                                                        SUM(v.total) AS total_comprado,
+                                                        COUNT(v.id_venta) AS numero_compras,
+                                                        MAX(v.fecha) AS ultima_compra
+                                                    FROM ventas v
+                                                    JOIN clientes c ON v.id_cliente = c.id_cliente
+                                                    GROUP BY c.id_cliente, c.nombre
+                                                    ORDER BY numero_compras DESC
+                                                    LIMIT 10";
+
+                                            $stmt = $conexion->prepare($sql);
+                                            $stmt->execute();
+                                            $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                            if ($clientes) {
+                                                $contador = 1;
+                                                foreach ($clientes as $row) {
+                                                    echo "<tr>";
+                                                    echo "<td>" . $contador++ . "</td>";
+                                                    echo "<td>" . htmlspecialchars($row['nombre']) . "</td>";
+                                                    echo "<td>$" . number_format($row['total_comprado'], 2) . "</td>";
+                                                    echo "<td>" . $row['numero_compras'] . "</td>";
+                                                    echo "<td>" . $row['ultima_compra'] . "</td>";
+                                                    echo "</tr>";
+                                                }
+                                            } else {
+                                                echo '<tr><td colspan="5" style="text-align:center;">No hay datos de clientes</td></tr>';
+                                            }
+                                        } catch (PDOException $e) {
+                                            echo '<tr><td colspan="5" style="text-align:center;">Error: ' . htmlspecialchars($e->getMessage()) . '</td></tr>';
+                                        }
+                                        ?>
+                                        </tbody>
                                 </table>
                             </div>
                         </div>
 
                         <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                            <div class="export-buttons">
-                                <button class="export-btn" onclick="exportExcel()">📊 Excel</button>
-                                <button class="export-btn" onclick="exportPDF()">📄 PDF</button>
-                                <button class="export-btn" onclick="exportJSON()">📁 JSON</button>
-                            </div>
+                            <form method=POST action=../../controllers/indicadores/reportes.php>
+                                <div class="export-buttons">
+                                    <button class="export-btn" name=reporte value=excel>📊 Excel</button>
+                                    <button class="export-btn" name=reporte value=pdf>📄 PDF</button>
+                                    <button class="export-btn" name=reporte value=json>📁 JSON</button>
+                                </div>
+                            </form>
                         </div>
 
                     </div>

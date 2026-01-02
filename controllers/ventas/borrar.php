@@ -4,7 +4,7 @@
 # check session.
 require ("../../vendor/autoload.php");   # librerias composer y variables de entorno.
 require ("../../.config/.conexion.php"); # conexion a la base de datos.
-require ("../../models/lecturas/compras.php"); # mostrar tabla
+require ("../../models/eliminar/compras.php"); # mostrar tabla
 require ('../../utils/mensajes_back.php'); # mensajes de error
 require ("../../controllers/filtros/check_session.php"); # comprobar session.
 $redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
@@ -13,7 +13,6 @@ session_start();
 
 # conexion a la base de datos
 $conexion = conexion($_ENV['HOST'], $_ENV['USER'], $_ENV['SECRET'], $_ENV['DB']);
-
 # verificar session
 if (isset($_SESSION['usuario'], $_SESSION['id_empresa'], $_SESSION['rol'], $_POST['id'])) {
     check_session($conexion,
@@ -26,23 +25,20 @@ else {
     exit;
 }
 
-if (isset($_POST['tipo'])) {
-    if ($_POST['tipo'] === 'servicio') {
-        $_SESSION['id_compra'] = $_POST['id'];
-        header("Location:../../pages/gestion/actualizar_compras.php"); 
-    }
-    elseif ($_POST['tipo'] === 'inventario') {
-        $_SESSION['id_inventario'] = $_POST['id'];
-        echo 'generando inventario';
-        header("Location:../../pages/gestion/actualizar_inventario.php"); 
-    }
-    else {
-        header("Location:../../pages/gestion/compras.php");
-    }
+$redirec = "../../pages/gestion/ventas.php";
+
+$id_venta = (int)$_POST['id'];
+// Sentencia preparada para eliminar directamente
+$sql_delete = "DELETE FROM ventas WHERE id_venta = ?";
+$stmt = $conexion->prepare($sql_delete);
+// Ejecución pasando el ID en el arreglo
+if ($stmt->execute([$id_venta])) {
+    header("Location: $redirec");
+    exit;
 }
-else {
-    header("Location:../../pages/gestion/compras.php");
-}
+header("Location: $redirec");
 exit;
+
+
 
 ?>

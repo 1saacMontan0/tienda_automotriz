@@ -3,6 +3,8 @@
 # check session.
 require ("../../vendor/autoload.php");   # librerias composer y variables de entorno.
 require ("../../.config/.conexion.php"); # conexion a la base de datos.
+require ('../../utils/mensajes_back.php'); # mensajes de error
+require ("../../models/lecturas/inventario.php"); # mostrar tabla
 require ("../../controllers/filtros/check_session.php"); # comprobar session.
 $redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
 
@@ -69,14 +71,16 @@ else {
                         <div class="card-header">
                             <h2>📊 Inventario Actual</h2>
                         </div>
+                        <?php error_mensaje_back(); ?>
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-3">
-                                <div></div>
-                                <div class="export-buttons">
-                                    <button class="export-btn" onclick="exportInventarioExcel()">📊 Excel</button>
-                                    <button class="export-btn" onclick="exportInventarioPDF()">📄 PDF</button>
-                                    <button class="export-btn" onclick="exportInventarioJSON()">📁 JSON</button>
-                                </div>
+                                <form method=POST action=../../controllers/inventario/reportes.php>
+                                    <div class="export-buttons">
+                                        <button class="export-btn" name=reporte value=excel>📊 Excel</button>
+                                        <button class="export-btn" name=reporte value=pdf>📄 PDF</button>
+                                        <button class="export-btn" name=reporte value=json>📁 JSON</button>
+                                    </div>
+                                </form>
                             </div>
 
                             <div class="table-responsive">
@@ -94,20 +98,19 @@ else {
                                             <th>Ganancia</th>
                                             <th>Última Actualización</th>
                                             <th>Acciones</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaInventario">
-                                        <tr>
-                                            <td colspan="11" class="text-center">No hay productos en inventario</td>
-                                        </tr>
+                                        <?php inventario($conexion, $_SESSION['id_empresa']); ?>
                                     </tbody>
                                 </table>
-                            </div> <!-- cierre .table-responsive -->
-                        </div> <!-- cierre .card-body -->
-                    </div> <!-- cierre .card -->
-                </div> <!-- cierre .tab-content -->
-            </div> <!-- cierre #inventario -->
-        </div> <!-- cierre .tabs-content -->
-    </div> <!-- cierre #appContent -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

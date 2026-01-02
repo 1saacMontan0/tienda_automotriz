@@ -3,6 +3,7 @@
 # check session.
 require ("../../vendor/autoload.php");   # librerias composer y variables de entorno.
 require ("../../.config/.conexion.php"); # conexion a la base de datos.
+require ("../../models/lecturas/empresa.php"); # conexion a la base de datos.
 require ("../../controllers/filtros/check_session.php"); # comprobar session.
 $redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
 
@@ -19,6 +20,17 @@ if (isset($_SESSION['usuario'], $_SESSION['id_empresa'], $_SESSION['rol'])) {
 else {
     $_SESSION['errores'][] = 'usuario no autorizado';
     header("Location: $redirec");
+    exit;
+}
+
+# obtiene un registro segun el id
+$registro = optener_empresa($conexion, $_SESSION['id_empresa']);
+# verificar si existen valores de retorno
+if (isset($registro)) {
+    // Accedemos a la primera fila [0]
+    $empresa = $registro[0];
+} else {
+    header("Location: ../../pages/gestion/clientes.php");
     exit;
 }
 
@@ -121,47 +133,63 @@ else {
                         <h2 style="margin:0; color: white;">⚙️ Configuración del Sistema</h2>
                     </div>
                     <div class="card-body" style="background: white; padding: 25px; border: 1px solid #ddd; border-top: none;">
-                        
+                        <form method=POST action=../../controllers/configuracion/actualizar.php>
                         <div class="form-grid">
-                            <div>
-                                <label for="configNombreEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre de la Empresa *</label>
-                                <input id="configNombreEmpresa" class="form-control" placeholder="Ej: Mi Taller SV" required>
-                            </div>
-                            <div>
-                                <label for="configTelefonoEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Teléfono de la Empresa</label>
-                                <input id="configTelefonoEmpresa" class="form-control" placeholder="Ej: 2222-3333">
-                            </div>
-                            <div>
-                                <label for="configCorreoEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Correo de la Empresa</label>
-                                <input id="configCorreoEmpresa" class="form-control" type="email" placeholder="Ej: info@mitaller.com">
-                            </div>
-                            <div>
-                                <label for="configDireccionEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Dirección de la Empresa</label>
-                                <input id="configDireccionEmpresa" class="form-control" placeholder="Ej: San Salvador">
-                            </div>
-                            <div>
-                                <label for="configNIT" style="display: block; margin-bottom: 5px; font-weight: 600;">NIT de la Empresa</label>
-                                <input id="configNIT" class="form-control" placeholder="Ej: 0614-280789-103-4">
-                            </div>
-                            <div>
-                                <label for="configNRC" style="display: block; margin-bottom: 5px; font-weight: 600;">NRC de la Empresa</label>
-                                <input id="configNRC" class="form-control" placeholder="Ej: 123456-7">
-                            </div>
-                            <div>
-                                <label for="configGiro" style="display: block; margin-bottom: 5px; font-weight: 600;">Giro de la Empresa</label>
-                                <input id="configGiro" class="form-control" placeholder="Ej: Venta de repuestos automotrices">
-                            </div>
-                            <div style="display: flex; align-items: end;">
-                                <button class="btn btn-success" onclick="guardarConfiguracion()">
-                                    <span>💾</span> Guardar Configuración
-                                </button>
-                            </div>
+                            
+                                <div>
+                                    <label for="configNombreEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Nombre de la Empresa *</label>
+                                    <input id="configNombreEmpresa" class="form-control" name=nombre
+                                        value=<?php echo $empresa['nombre']; ?> placeholder="Ej: Mi Taller SV" required>
+                                </div>
+                                <div>
+                                    <label for="configTelefonoEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Teléfono de la Empresa</label>
+                                    <input id="configTelefonoEmpresa" class="form-control" name=telefono
+                                        value=<?php echo $empresa['telefono']; ?> placeholder="Ej: 2222-3333">
+                                </div>
+                                <div>
+                                    <label for="configCorreoEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Correo de la Empresa</label>
+                                    <input id="configCorreoEmpresa" class="form-control" type="email" name=correo
+                                        value=<?php echo $empresa['correo']; ?> placeholder="Ej: info@mitaller.com">
+                                </div>
+                                <div>
+                                    <label for="configDireccionEmpresa" style="display: block; margin-bottom: 5px; font-weight: 600;">Dirección de la Empresa</label>
+                                    <input id="configDireccionEmpresa" class="form-control" name=direccion
+                                        value=<?php echo $empresa['direccion']; ?> placeholder="Ej: San Salvador">
+                                </div>
+                                <div>
+                                    <label for="configNIT" style="display: block; margin-bottom: 5px; font-weight: 600;">NIT de la Empresa</label>
+                                    <input id="configNIT" class="form-control" name=nit 
+                                        value=<?php echo $empresa['nit']; ?> placeholder="Ej: 0614-280789-103-4">
+                                </div>
+                                <div>
+                                    <label for="configNRC" style="display: block; margin-bottom: 5px; font-weight: 600;">NRC de la Empresa</label>
+                                    <input id="configNRC" class="form-control" name=nrc
+                                        value=<?php echo $empresa['nrc']; ?> placeholder="Ej: 123456-7">
+                                </div>
+                                <div>
+                                    <label for="configGiro" style="display: block; margin-bottom: 5px; font-weight: 600;">Giro de la Empresa</label>
+                                    <input id="configGiro" class="form-control" name=giro
+                                        value=<?php echo $empresa['giro']; ?> placeholder="Ej: Venta de repuestos automotrices">
+                                </div>
+                                <div style="display: flex; align-items: end;">
+                                    <button class="btn btn-success" onclick="guardarConfiguracion()">
+                                        <span>💾</span> Guardar Configuración
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-
+                        </form>
                         <div class="mt-4">
                             <h3>📋 Información Actual de la Empresa</h3>
                             <div id="infoEmpresaActual" style="background: rgba(26, 95, 180, 0.05); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
-                                <p>Cargando información...</p>
+                                <ul>
+                                    <?php
+                                        foreach ($empresa as $campo => $valor) {
+                                            $label = ucfirst(str_replace('_', ' ', $campo));
+                                            echo "<li><strong>$label:</strong> $valor</li>";
+                                        }
+                                    ?>
+                                </ul>
                             </div>
                         </div>
 

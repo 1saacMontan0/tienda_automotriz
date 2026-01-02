@@ -4,6 +4,7 @@
 require ("../../vendor/autoload.php");   # librerias composer y variables de entorno.
 require ("../../.config/.conexion.php"); # conexion a la base de datos.
 require ("../../controllers/filtros/check_session.php"); # comprobar session.
+require ("../../models/lecturas/finanzas.php");
 $redirec = "../../index.php"; # donde se enviara al usuario si algo falla.
 
 session_start();
@@ -184,72 +185,152 @@ else {
                         </div>
                         
                         <div id="ingresos" class="finance-pane active">
-                            <div class="form-grid">
-                                <div>
-                                    <label>Descripción *</label>
-                                    <input id="ingDescripcion" class="form-control" placeholder="Ej: Venta de repuestos">
+                            <form method=POST action=../../controllers/finanzas/registrar_ingresos.php>
+                                <div class="form-grid">
+                                    <div>
+                                        <label>Descripción *</label>
+                                        <input id="ingDescripcion" class="form-control"
+                                            name=descripcion placeholder="Ej: Venta de repuestos">
+                                    </div>
+                                    <div>
+                                        <label>Monto *</label>
+                                        <input id="ingMonto" class="form-control"
+                                            name=monto type="number" placeholder="0.00">
+                                    </div>
+                                    <div>
+                                        <label>Categoría *</label>
+                                        <select name=categoria id="ingCategoria" class="form-select">
+                                            <option value="ventas">Ventas</option>
+                                            <option value="servicios">Servicios</option>
+                                            <option value="inversiones">Inversiones</option>
+                                            <option value="otros">Otros</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: flex; align-items: end;">
+                                        <button class="btn btn-success" onclick="alert('Ingreso registrado')">💰 Registrar</button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label>Monto *</label>
-                                    <input id="ingMonto" class="form-control" type="number" placeholder="0.00">
-                                </div>
-                                <div>
-                                    <label>Categoría *</label>
-                                    <select id="ingCategoria" class="form-select">
-                                        <option value="ventas">Ventas</option>
-                                        <option value="servicios">Servicios</option>
-                                    </select>
-                                </div>
-                                <div style="display: flex; align-items: end;">
-                                    <button class="btn btn-success" onclick="alert('Ingreso registrado')">💰 Registrar</button>
-                                </div>
-                            </div>
+                            </form>
                             
                             <table class="table" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
                                 <thead>
                                     <tr>
                                         <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Fecha</th>
                                         <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Descripción</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Categoria</th>
                                         <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Monto</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Acciones</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaIngresos">
-                                    <tr><td colspan="3" style="text-align:center; padding: 20px;">No hay datos</td></tr>
+                                    <?php ingresos($conexion); ?>
                                 </tbody>
                             </table>
                         </div>
                         
                         <div id="egresos" class="finance-pane">
-                            <div class="form-grid">
-                                <div>
-                                    <label>Descripción *</label>
-                                    <input id="egrDescripcion" class="form-control" placeholder="Ej: Pago de luz">
+                            <form method=POST action=../../controllers/finanzas/registrar_egresos.php>
+                                <div class="form-grid">
+                                    <div>
+                                        <label>Descripción *</label>
+                                        <input id="ingDescripcion" class="form-control"
+                                            name=descripcion placeholder="Ej: Venta de repuestos">
+                                    </div>
+                                    <div>
+                                        <label>Monto *</label>
+                                        <input id="ingMonto" class="form-control"
+                                            name=monto type="number" placeholder="0.00">
+                                    </div>
+                                    <div>
+                                        <label>Categoría *</label>
+                                        <select name=categoria id="ingCategoria" class="form-select">
+                                            <option value="compras">Compras</option>
+                                            <option value="servicios">Servicios</option>
+                                            <option value="nominas">Nominas</option>
+                                            <option value="alquiler">Alquiler</option>
+                                            <option value="impuestos">Impuestos</option>
+                                            <option value="mantenimiento">Mantenimiento</option>
+                                            <option value="otros">Otros</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: flex; align-items: end;">
+                                        <button class="btn btn-success" onclick="alert('Ingreso registrado')">💰 Registrar</button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label>Monto *</label>
-                                    <input id="egrMonto" class="form-control" type="number" placeholder="0.00">
+                            </form>
+                            <table class="table" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Fecha</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Descripción</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Categoria</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Monto</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;">Acciones</th>
+                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #eee;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaIngresos">
+                                    <?php egresos($conexion) ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="resumen" class="finance-pane">
+                        <div class="financial-summary">
+                            <?php
+                            try {
+                                // 1. Intentamos obtener los totales de las nuevas tablas
+                                // Usamos subconsultas para obtener ambos totales en una sola fila de forma segura
+                                $sentencia = "SELECT 
+                                                (SELECT SUM(monto) FROM ingresos) AS total_ingresos,
+                                                (SELECT SUM(monto) FROM egresos) AS total_egresos";
+
+                                $consulta = $conexion->prepare($sentencia);
+                                $consulta->execute();
+                                $datos = $consulta->fetch(PDO::FETCH_ASSOC);
+
+                                $ingresos = $datos['total_ingresos'] ?? 0;
+                                $egresos  = $datos['total_egresos'] ?? 0;
+                            } catch (Exception $e) {
+                                // Si las tablas no existen o fallan, ponemos 0 para que el JS no se rompa
+                                $ingresos = 0;
+                                $egresos  = 0;
+                            }
+
+                            $utilidad = $ingresos - $egresos;
+                            ?>
+
+                            <div class="summary-card income">
+                                <h3>Ingresos</h3>
+                                <div class="summary-value" style="color: var(--secondary-color)">
+                                    $<?php echo number_format($ingresos, 2); ?>
                                 </div>
-                                <div style="display: flex; align-items: end;">
-                                    <button class="btn btn-success" onclick="alert('Egreso registrado')">📉 Registrar</button>
+                            </div>
+
+                            <div class="summary-card expense">
+                                <h3>Egresos</h3>
+                                <div class="summary-value" style="color: var(--danger-color)">
+                                    $<?php echo number_format($egresos, 2); ?>
+                                </div>
+                            </div>
+
+                            <div class="summary-card profit">
+                                <h3>Utilidad</h3>
+                                <div class="summary-value" style="color: var(--primary-color)">
+                                    $<?php echo number_format($utilidad, 2); ?>
                                 </div>
                             </div>
                         </div>
                         
-                        <div id="resumen" class="finance-pane">
-                            <div class="financial-summary">
-                                <div class="summary-card income">
-                                    <h3>Ingresos</h3>
-                                    <div class="summary-value" style="color: var(--secondary-color)">$0.00</div>
-                                </div>
-                                <div class="summary-card expense">
-                                    <h3>Egresos</h3>
-                                    <div class="summary-value" style="color: var(--danger-color)">$0.00</div>
-                                </div>
-                                <div class="summary-card profit">
-                                    <h3>Utilidad</h3>
-                                    <div class="summary-value" style="color: var(--primary-color)">$0.00</div>
-                                </div>
+                        <form method="POST" action="../../controllers/finanzas/reportes.php">
+                            <div class="export-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
+                                <button class="export-btn" name="reporte" value="excel" style="padding: 10px 20px; cursor: pointer;">📊 Excel</button>
+                                <button class="export-btn" name="reporte" value="pdf" style="padding: 10px 20px; cursor: pointer;">📄 PDF</button>
+                                <button class="export-btn" name="reporte" value="json" style="padding: 10px 20px; cursor: pointer;">📁 JSON</button>
                             </div>
+                        </form>
+                    </div>
                         </div>
 
                     </div>
