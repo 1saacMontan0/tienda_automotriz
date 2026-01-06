@@ -24,7 +24,7 @@ else {
 }
 
 // Ruta de redirección al finalizar
-$redirec_ingresos = "../../pages/gestion/finanzas.php"; 
+$redirec_ingresos = "../../pages/gestion/finanzas.php#egresos"; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {

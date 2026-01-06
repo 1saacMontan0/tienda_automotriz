@@ -61,10 +61,11 @@ function ventas($conexion, $id_empresa) {
                 echo '<td>' . $fila['fecha'] ."<br>". $fila['hora'] . '</td>';
                 
                  echo "<td style='width:120px'>
-                    <form action='../../pages/gestion/ventas/actualizar_venta.php' method='post'>
+                    <form action='../../controllers/ventas/factura.php' method='post'>
                         <button type='submit' name='id' value='" . htmlspecialchars($fila['id']) . "'
                             style='border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: none; width:115px; height:35px;
-                                transition: all 0.3s ease; font-weight: 600; border: 2px solid rgba(98, 160, 234, 0.3);'>
+                                transition: all 0.3s ease; font-weight: 600; border: 2px solid rgba(98, 160, 234, 0.3);'
+                            onclick='mostrar_factura()'>
                             Factura
                         </button>
                     </form>

@@ -283,8 +283,14 @@ else {
                                 // 1. Intentamos obtener los totales de las nuevas tablas
                                 // Usamos subconsultas para obtener ambos totales en una sola fila de forma segura
                                 $sentencia = "SELECT 
-                                                (SELECT SUM(monto) FROM ingresos) AS total_ingresos,
-                                                (SELECT SUM(monto) FROM egresos) AS total_egresos";
+                                    (
+                                        COALESCE((SELECT SUM(monto) FROM ingresos), 0) + 
+                                        COALESCE((SELECT SUM(total) FROM ventas), 0)
+                                    ) AS total_ingresos,
+                                    (
+                                        COALESCE((SELECT SUM(monto) FROM egresos), 0) + 
+                                        COALESCE((SELECT SUM(precio_compra) FROM compras), 0)
+                                    ) AS total_egresos";
 
                                 $consulta = $conexion->prepare($sentencia);
                                 $consulta->execute();

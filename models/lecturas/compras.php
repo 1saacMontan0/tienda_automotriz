@@ -40,7 +40,7 @@ function generar_compras($conexion, $id_empresa) {
                     '</div>
                 </td>';
                 echo '<td>$'.$fila['precio_compra'].'</td>';
-                echo '<td>'.$fila['precio_venta'].'</td>';
+                echo '<td>$'.$fila['precio_venta'].'</td>';
                 echo '<td>' . $fila['fecha'] ." ". $fila['hora'] . '</td>';
                 
                 // Botón Editar

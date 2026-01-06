@@ -69,7 +69,7 @@ if (!isset($registro_producto)) {
             <div id="ventas" class="tab-pane active">
                 <div class="card">
                     <div class="card-header" style="color: white;">
-                        <h2>💰 Ventas Detalladas</h2>
+                        <h2>💰 Actualizar Ventas Detalladas</h2>
                     </div>
                     <div class="card-body">
                         

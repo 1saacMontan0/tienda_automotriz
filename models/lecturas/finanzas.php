@@ -3,8 +3,11 @@
 function ingresos($conexion) {
     // 1. Se añade el FROM para especificar la tabla (ajustar nombre si es diferente)
     $sentencia = "SELECT id_ingreso AS id, descripcion, categoria, monto, fecha, hora 
-                  FROM ingresos 
-                  ORDER BY fecha DESC, hora DESC";
+              FROM ingresos 
+              UNION ALL 
+              SELECT id_venta AS id, 'Sin descripción' AS descripcion, 'ventas' AS categoria, total AS monto, fecha, hora 
+              FROM ventas 
+              ORDER BY fecha DESC, hora DESC";
     
     $consulta = $conexion->query($sentencia);
     $registros = $consulta->fetchAll(PDO::FETCH_ASSOC);
@@ -22,7 +25,7 @@ function ingresos($conexion) {
                 
                 // Botón Editar
                 echo "<td style='width:120px'>
-                    <form action='../../pages/gestion/actualizar_ventas.php' method='post'>
+                    <form action='../../pages/gestion/actualizar_ingresos.php' method='post'>
                         <button type='submit' name='id' value='" . htmlspecialchars($fila['id']) . "'
                             style='border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: none; width:115px; height:35px;
                                 transition: all 0.3s ease; font-weight: 600; border: 2px solid rgba(98, 160, 234, 0.3);'>
@@ -33,7 +36,7 @@ function ingresos($conexion) {
                 
                 // Botón Eliminar
                 echo "<td style='width:120px'>
-                    <form action='../../controllers/ventas/borrar.php' method='post'>
+                    <form action='../../controllers/finanzas/borrar_ingresos.php' method='post'>
                         <button type='submit' name='id' value='" . htmlspecialchars($fila['id']) . "'
                             style='border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: none; width:115px; height:35px;
                                 transition: all 0.3s ease; font-weight: 600; border: 2px solid rgba(192, 28, 40, 0.3);'>
@@ -54,8 +57,13 @@ function ingresos($conexion) {
 function egresos($conexion) {
     // 1. Se añade el FROM para especificar la tabla (ajustar nombre si es diferente)
     $sentencia = "SELECT id_egreso AS id, descripcion, categoria, monto, fecha, hora 
-                  FROM egresos
-                  ORDER BY fecha DESC, hora DESC";
+              FROM egresos 
+              UNION ALL 
+              SELECT id_compra AS id, descripcion, 'compras' AS categoria, (cantidad * precio_compra) AS monto, fecha, hora 
+              FROM compras 
+              ORDER BY fecha DESC, hora DESC";
+
+    
     
     $consulta = $conexion->query($sentencia);
     $registros = $consulta->fetchAll(PDO::FETCH_ASSOC);
@@ -73,7 +81,7 @@ function egresos($conexion) {
                 
                 // Botón Editar
                 echo "<td style='width:120px'>
-                    <form action='../../pages/gestion/actualizar_ventas.php' method='post'>
+                    <form action='../../pages/gestion/actualizar_egresos.php' method='post'>
                         <button type='submit' name='id' value='" . htmlspecialchars($fila['id']) . "'
                             style='border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: none; width:115px; height:35px;
                                 transition: all 0.3s ease; font-weight: 600; border: 2px solid rgba(98, 160, 234, 0.3);'>
@@ -84,7 +92,7 @@ function egresos($conexion) {
                 
                 // Botón Eliminar
                 echo "<td style='width:120px'>
-                    <form action='../../controllers/ventas/borrar.php' method='post'>
+                    <form action='../../controllers/finanzas/borrar_egresos.php' method='post'>
                         <button type='submit' name='id' value='" . htmlspecialchars($fila['id']) . "'
                             style='border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: none; width:115px; height:35px;
                                 transition: all 0.3s ease; font-weight: 600; border: 2px solid rgba(192, 28, 40, 0.3);'>
